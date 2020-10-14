@@ -1,0 +1,2 @@
+AWS SIG4V Plugin for Cassandra Go Driver
+Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
