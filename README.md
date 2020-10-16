@@ -14,6 +14,11 @@ The full documentation for the plugin is available at AWS Docs:
 # Using the Plugin
 The following sections describe how to use the authentication plugin for the open-source gocql Driver for Cassandra to access Amazon Keyspaces.
 
+To install the plugin:
+```bash
+$ go get github.com/aws/aws-sigv4-auth-cassandra-gocql-driver-plugin
+```
+
 ## SSL Configuration
 
 The first step is to get an Amazon digital certificate to encrypt your connections using Transport Layer Security (TLS).  The Gocql driver must use an SSL trust store so that the client SSL engine can validate the Amazon Keyspaces certificate on connection.
@@ -45,8 +50,17 @@ Simply use AwsAuthenticator for the authenticator property of the cluster
 Here is a simple example of use:
 
 ```go
-func sigV4Connection() {
-    // configuring the cluster options
+package main
+
+import (
+        "fmt"
+        "github.com/aws/aws-sigv4-auth-cassandra-gocql-driver-plugin/sigv4"
+        "github.com/gocql/gocql"
+        "log"
+)
+
+func main() {
+	// configuring the cluster options
 	cluster := gocql.NewCluster("cassandra.us-west-2.amazonaws.com:9142")
 	var auth sigv4.AwsAuthenticator = sigv4.NewAwsAuthenticator()
 	auth.Region = "us-west-2"
