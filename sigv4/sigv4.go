@@ -18,7 +18,7 @@
 package sigv4
 
 import (
-	"github.com/aws/aws/aws-sigv4-auth-cassandra-gocql-driver-plugin/sigv4/internal"
+	"github.com/aws/aws-sigv4-auth-cassandra-gocql-driver-plugin/sigv4/internal"
 	"github.com/gocql/gocql"
 	"os"
 	"time"
