@@ -18,10 +18,11 @@
 package sigv4
 
 import (
-	"github.com/aws/aws-sigv4-auth-cassandra-gocql-driver-plugin/sigv4/internal"
-	"github.com/gocql/gocql"
 	"os"
 	"time"
+
+	"github.com/aws/aws-sigv4-auth-cassandra-gocql-driver-plugin/sigv4/internal"
+	"github.com/gocql/gocql"
 )
 
 // Authenticator for AWS Integration
@@ -34,10 +35,21 @@ type AwsAuthenticator struct {
 	currentTime     time.Time // this is mainly used for testing and not exposed
 }
 
+// looks up AWS_DEFAULT_REGION, and falls back to AWS_REGION for Lambda compatibility
+func getRegionEnvironment() string {
+	region := os.Getenv("AWS_DEFAULT_REGION")
+
+	if len(region) == 0 {
+		region = os.Getenv("AWS_REGION")
+	}
+
+	return region
+}
+
 // initializes authenticator with standard AWS CLI environment variables if they exist.
 func NewAwsAuthenticator() AwsAuthenticator {
 	return AwsAuthenticator{
-		Region:          os.Getenv("AWS_DEFAULT_REGION"),
+		Region:          getRegionEnvironment(),
 		AccessKeyId:     os.Getenv("AWS_ACCESS_KEY_ID"),
 		SecretAccessKey: os.Getenv("AWS_SECRET_ACCESS_KEY"),
 		SessionToken:    os.Getenv("AWS_SESSION_TOKEN")}
@@ -48,11 +60,11 @@ func (p AwsAuthenticator) Challenge(req []byte) ([]byte, gocql.Authenticator, er
 
 	// copy these rather than use a reference due to how gocql creates connections (its just
 	// safer if everything if a fresh copy).
-	auth := signingAuthenticator{ region: p.Region,
-		accessKeyId: p.AccessKeyId,
+	auth := signingAuthenticator{region: p.Region,
+		accessKeyId:     p.AccessKeyId,
 		secretAccessKey: p.SecretAccessKey,
-		sessionToken: p.SessionToken,
-		currentTime: p.currentTime}
+		sessionToken:    p.SessionToken,
+		currentTime:     p.currentTime}
 	return resp, auth, nil
 }
 
@@ -66,7 +78,8 @@ type signingAuthenticator struct {
 	accessKeyId     string
 	secretAccessKey string
 	sessionToken    string
-	currentTime     time.Time}
+	currentTime     time.Time
+}
 
 func (p signingAuthenticator) Challenge(req []byte) ([]byte, gocql.Authenticator, error) {
 	nonce, err := internal.ExtractNonce(req)

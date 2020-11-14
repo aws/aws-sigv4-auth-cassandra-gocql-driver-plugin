@@ -17,9 +17,11 @@
 package sigv4
 
 import (
-	"github.com/stretchr/testify/assert"
+	"os"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var stdNonce = []byte("nonce=91703fdc2ef562e19fbdab0f58e42fe5")
@@ -39,6 +41,23 @@ func TestShouldTranslate(t *testing.T) {
 	resp, _, _ := challenger.Challenge(stdNonce)
 	expected := "signature=7f3691c18a81b8ce7457699effbfae5b09b4e0714ab38c1292dbdf082c9ddd87,access_key=UserID-1,amzdate=2020-06-09T22:41:51.000Z"
 	assert.Equal(t, expected, string(resp))
+}
+
+func TestAssignFallbackRegionEnvironmentVariable(t *testing.T) {
+	os.Setenv("AWS_DEFAULT_REGION", "us-west-2")
+	os.Setenv("AWS_REGION", "us-east-2")
+
+	defaultRegionTarget := NewAwsAuthenticator()
+
+	assert.Equal(t, "us-west-2", defaultRegionTarget.Region)
+
+	os.Unsetenv("AWS_DEFAULT_REGION")
+
+	regionTarget := NewAwsAuthenticator()
+
+	assert.Equal(t, "us-east-2", regionTarget.Region)
+
+	os.Unsetenv("AWS_REGION")
 }
 
 func buildStdTarget() *AwsAuthenticator {

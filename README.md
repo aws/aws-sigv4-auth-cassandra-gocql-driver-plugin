@@ -37,7 +37,7 @@ You can specify the Region using one of the following four methods:
 
 ## Environment Variables
 The following values of AwsAuthenticator will be set from environment variables on initial new
-  - Region: from environment variable AWS_DEFAULT_REGION
+  - Region: from environment variable AWS_DEFAULT_REGION, falling back to AWS_REGION
   - AccessKeyId: from environment variable AWS_ACCESS_KEY_ID
   - SecretAccessKey: from environment variable AWS_SECRET_ACCESS_KEY
   - SessionToken:  from environment variable AWS_SESSION_TOKEN
@@ -45,7 +45,7 @@ The following values of AwsAuthenticator will be set from environment variables 
 ## How to use the Authentication Plugin
 
 When using the open-source gocql driver, the connection to your Amazon Keyspaces endpoint is represented by the `Cluster` class.
-Simply use AwsAuthenticator for the authenticator property of the cluster
+Simply use AwsAuthenticator for the authenticator property of the cluster.
 
 Here is a simple example of use:
 
@@ -94,3 +94,9 @@ func main() {
 }
 ```
 
+When using AwsAuthenticator from an AWS Lambda function, the Lambda runtimes will initialize all the needed environment variables.
+All you need to do is assign the authenticator.
+
+```go
+	cluster.Authenticator = sigv4.NewAwsAuthenticator()
+```
