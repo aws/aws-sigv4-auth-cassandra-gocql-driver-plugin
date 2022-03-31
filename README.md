@@ -21,10 +21,13 @@ $ go get github.com/aws/aws-sigv4-auth-cassandra-gocql-driver-plugin
 
 ## SSL Configuration
 
-The first step is to get an Amazon digital certificate to encrypt your connections using Transport Layer Security (TLS).  The Gocql driver must use an SSL trust store so that the client SSL engine can validate the Amazon Keyspaces certificate on connection.
+Amazon Keyspaces requires the use of Transport Layer Security (TLS) to help secure connections with clients. To connect to Amazon Keyspaces using TLS, you need to download an Amazon digital certificate and configure the Python driver to use TLS.
 
-To use the trust store and create a certificate, see  
-[Using a Cassandra Java Client Driver to Access Amazon Keyspaces Programmatically](https://docs.aws.amazon.com/keyspaces/latest/devguide/programmatic.drivers.html#using_java_driver).
+Download the Starfield digital certificate using the following command and save sf-class2-root.crt locally or in your home directory.
+
+```
+curl https://certs.secureserver.net/repository/sf-class2-root.crt -O
+```
 
 ## Region Configuration
 
