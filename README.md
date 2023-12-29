@@ -6,6 +6,8 @@ The current version is 1.0.0. Please see the [changelog](./CHANGELOG.md) for det
 
 This package implements an authentication plugin for the open-source [Gocql Driver](https://github.com/gocql/gocql) for Apache Cassandra. The driver enables you to add authentication information to your API requests using the AWS Signature Version 4 Process (SigV4). Using the plugin, you can provide users and applications short-term credentials to access Amazon Keyspaces (for Apache Cassandra) using AWS Identity and Access Management (IAM) users and roles.
 
+The plugin depends on the AWS SDK for Go. It uses the default credential provider chain to obtain credentials.
+
 You must specify the service endpoint to use for the connection. You can provide the Region in the constructor programmatically, via the `AWS_DEFAULT_REGION` environment variable.
 
 The full documentation for the plugin is available at AWS Docs:
@@ -37,13 +39,24 @@ You can specify the Region using one of the following four methods:
 
 * Environment Variable
 * Configuration
+* Function Argument
 
-## Environment Variables
-The following values of AwsAuthenticator will be set from environment variables on initial new
-  - Region: from environment variable AWS_DEFAULT_REGION, falling back to AWS_REGION
-  - AccessKeyId: from environment variable AWS_ACCESS_KEY_ID
-  - SecretAccessKey: from environment variable AWS_SECRET_ACCESS_KEY
-  - SessionToken:  from environment variable AWS_SESSION_TOKEN
+### Environment Variable
+You can use the `AWS_REGION` environment variable to match the endpoint that you are communicating with by setting it as part of your application start-up, as follows.
+
+```
+$ export AWS_Region=us-east-1
+```
+
+### Function Argument
+
+One of the functions takes a String representing the Region as an argument, that will be used for that instance.
+
+```
+func NewAwsAuthenticatorWithRegion(region string) AwsAuthenticator {
+
+}
+```
 
 ## How to use the Authentication Plugin
 
