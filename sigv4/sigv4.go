@@ -18,9 +18,9 @@
 package sigv4
 
 import (
-	"os"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sigv4-auth-cassandra-gocql-driver-plugin/sigv4/internal"
 	"github.com/gocql/gocql"
 )
@@ -35,31 +35,38 @@ type AwsAuthenticator struct {
 	currentTime     time.Time // this is mainly used for testing and not exposed
 }
 
-// looks up AWS_DEFAULT_REGION, and falls back to AWS_REGION for Lambda compatibility
-func getRegionEnvironment() string {
-	region := os.Getenv("AWS_DEFAULT_REGION")
+// initializes authenticator with credentials loaded from AWS SDK's default credential provider chain.
+// region can be specified though environment variable or configuration.
+func NewAwsAuthenticator() AwsAuthenticator {
+	sess := session.Must(session.NewSession())
+	region := sess.Config.Region
+	creds, _ := sess.Config.Credentials.Get()
 
-	if len(region) == 0 {
-		region = os.Getenv("AWS_REGION")
-	}
-
-	return region
+	return AwsAuthenticator{
+		Region:          *region,
+		AccessKeyId:     creds.AccessKeyID,
+		SecretAccessKey: creds.SecretAccessKey,
+		SessionToken:    creds.SessionToken}
 }
 
-// initializes authenticator with standard AWS CLI environment variables if they exist.
-func NewAwsAuthenticator() AwsAuthenticator {
+// initializes authenticator with credentials loaded from AWS SDK's default credential provider chain.
+// region is accepted as an argument.
+func NewAwsAuthenticatorWithRegion(region string) AwsAuthenticator {
+	sess := session.Must(session.NewSession())
+	creds, _ := sess.Config.Credentials.Get()
+
 	return AwsAuthenticator{
-		Region:          getRegionEnvironment(),
-		AccessKeyId:     os.Getenv("AWS_ACCESS_KEY_ID"),
-		SecretAccessKey: os.Getenv("AWS_SECRET_ACCESS_KEY"),
-		SessionToken:    os.Getenv("AWS_SESSION_TOKEN")}
+		Region:          region,
+		AccessKeyId:     creds.AccessKeyID,
+		SecretAccessKey: creds.SecretAccessKey,
+		SessionToken:    creds.SessionToken}
 }
 
 func (p AwsAuthenticator) Challenge(req []byte) ([]byte, gocql.Authenticator, error) {
 	var resp []byte = []byte("SigV4\000\000")
 
-	// copy these rather than use a reference due to how gocql creates connections (its just
-	// safer if everything if a fresh copy).
+	// copy these rather than use a reference due to how gocql creates connections (it's just
+	// safer if everything is a fresh copy).
 	auth := signingAuthenticator{region: p.Region,
 		accessKeyId:     p.AccessKeyId,
 		secretAccessKey: p.SecretAccessKey,
