@@ -23,7 +23,7 @@ $ go get github.com/aws/aws-sigv4-auth-cassandra-gocql-driver-plugin
 
 ## SSL Configuration
 
-Amazon Keyspaces requires the use of Transport Layer Security (TLS) to help secure connections with clients. To connect to Amazon Keyspaces using TLS, you need to download an Amazon digital certificate and configure the Python driver to use TLS.
+Amazon Keyspaces requires the use of Transport Layer Security (TLS) to help secure connections with clients. To connect to Amazon Keyspaces using TLS, you need to download an Amazon digital certificate and configure the Go driver to use TLS.
 
 Download the Starfield digital certificate using the following command and save sf-class2-root.crt locally or in your home directory.
 
