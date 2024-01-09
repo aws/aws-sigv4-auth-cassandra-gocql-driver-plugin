@@ -61,6 +61,14 @@ func TestAssignFallbackRegionEnvironmentVariable(t *testing.T) {
 	os.Unsetenv("AWS_REGION")
 }
 
+func TestNewAwsAuthenticatorWithRegion(t *testing.T) {
+	region := "us-east-2"
+
+	authenticator := NewAwsAuthenticatorWithRegion(region)
+
+	assert.Equal(t, region, authenticator.Region)
+}
+
 func buildStdTarget() *AwsAuthenticator {
 	target := AwsAuthenticator{
 		Region:          "us-west-2",
