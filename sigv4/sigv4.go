@@ -47,15 +47,25 @@ type AwsAuthenticator struct {
 	currentTime         time.Time // this is mainly used for testing and not exposed
 }
 
+// looks up AWS_DEFAULT_REGION, and falls back to AWS_REGION for Lambda compatibility
+func getRegionEnvironment() string {
+	region := os.Getenv("AWS_DEFAULT_REGION")
+
+	if len(region) == 0 {
+		region = os.Getenv("AWS_REGION")
+	}
+
+	return region
+}
+
 // initializes authenticator with credentials loaded from AWS SDK's default credential provider chain.
 // region can be specified though environment variable or configuration.
 func NewAwsAuthenticator() AwsAuthenticator {
 	sess := session.Must(session.NewSession())
-	region := sess.Config.Region
 	creds, _ := sess.Config.Credentials.Get()
 
 	return AwsAuthenticator{
-		Region:          *region,
+		Region:          getRegionEnvironment(),
 		AccessKeyId:     creds.AccessKeyID,
 		SecretAccessKey: creds.SecretAccessKey,
 		SessionToken:    creds.SessionToken}

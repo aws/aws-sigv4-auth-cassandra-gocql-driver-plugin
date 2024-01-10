@@ -8,7 +8,7 @@ This package implements an authentication plugin for the open-source [Gocql Driv
 
 The plugin depends on the AWS SDK for Go. It uses the default credential provider chain to obtain credentials.
 
-You must specify the service endpoint to use for the connection. You can provide the Region in the constructor programmatically, via the `AWS_DEFAULT_REGION` environment variable.
+You must specify the service endpoint to use for the connection. You can provide the region as a function argument programmatically or via the `AWS_DEFAULT_REGION` environment variable.
 
 The full documentation for the plugin is available at AWS Docs:
 [Creating Credentials to Access Amazon Keyspaces](https://docs.aws.amazon.com/keyspaces/latest/devguide/programmatic.credentials.html#programmatic.credentials.SigV4_KEYSPACES)
@@ -42,17 +42,17 @@ You can specify the Region using one of the following four methods:
 * Function Argument
 
 ### Environment Variable
-You can use the `AWS_REGION` environment variable to match the endpoint that you are communicating with by setting it as part of your application start-up, as follows.
-
+You can use the `AWS_DEFAULT_REGION` environment variable to match the endpoint that you are communicating with by setting it as part of your application start-up.
+If `AWS_DEFAULT_REGION` environment variable is not set, falls back to the `AWS_REGION` environment variable.
 ```
-$ export AWS_Region=us-east-1
+$ export AWS_DEFAULT_REGION=us-east-1
 ```
 
 ### Function Argument
 
 One of the functions takes a String representing the Region as an argument, that will be used for that instance.
 
-```
+```go
 func NewAwsAuthenticatorWithRegion(region string) AwsAuthenticator {
 
 }
